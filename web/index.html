@@ -5,9 +5,34 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <style>
+      .app {
+        position: fixed;
+        transform: translateX(-50%);
+        left: 50%;
+        text-align: center;
+      }
+
+      .mqtt-settings {
+        text-align: left;
+      }
     </style>
 </head>
 <body>
+  <div class="app">
+    <h2>Remote Barcode Scanner</h2>
+    <div class="mqtt-settings">
+      <div>
+        <label>Topic:</label>
+        <input type="text" value="barcode" id="topic"/>
+      </div>
+      <div>
+        <label>Status:</label>
+        <span id="status"></span>
+      </div>
+    </div>
+    <button>Scan</button>
+    
+  </div>
   <script type="text/javascript">
   const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8)
 
@@ -29,24 +54,34 @@
     },
   }
 
-  console.log('Connecting mqtt client')
+  updateStatus('Connecting...');
   const client = mqtt.connect(host, options)
 
   client.on('error', (err) => {
     console.log('Connection error: ', err)
     client.end()
+    updateStatus(err);
   })
 
   client.on('reconnect', () => {
-    console.log('Reconnecting...')
+    updateStatus('Reconnecting...');
   })
 
   client.on('connect', () => {
     console.log('Client connected:' + clientId)
-    // Subscribe
-    //client.subscribe('testtopic', { qos: 0 })
-    client.publish('testtopic', 'ws connection demo...!', { qos: 0, retain: false })
+    updateStatus('Connected');
+    publish();
   })
+
+  function publish(){
+    const topic = document.getElementById("topic").value;
+    console.log(topic);
+    client.publish(topic, 'ws connection demo...!', { qos: 0, retain: false })
+  }
+
+  function updateStatus(status){
+    document.getElementById("status").innerText = status;
+  }
   </script>
 </body>
 </html>

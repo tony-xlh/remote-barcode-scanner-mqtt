@@ -100,6 +100,10 @@
         <label>Status:</label>
         <span id="status"></span>
       </div>
+      <div>
+        <label>Continuous scan:</label>
+        <input type="checkbox" id="continuous" checked/>
+      </div>
     </div>
     <button onclick="startScan();">Scan</button>
   </div>
@@ -209,10 +213,14 @@
           position: "center"
         }).showToast();
         publish(barcode);
-        const setProcessing = () => {
-          processing = false;
+        if (document.getElementById("continuous").checked) {
+          const setProcessing = () => {
+            processing = false;
+          }
+          setTimeout(setProcessing, 2000);
+        }else{
+          toggleProcessing();
         }
-        setTimeout(setProcessing, 2000);
       }else{
         processing = false;
       }

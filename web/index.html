@@ -19,6 +19,59 @@
       .mqtt-settings {
         text-align: left;
       }
+
+      .footer {
+        left: 0;
+        bottom: 0;
+        position: absolute;
+        height: 6em;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-evenly;
+      }
+
+      .play {
+        width: 4em;
+        height: 4em;
+        margin-top: calc(var(--shutter-size) / -2);
+        margin-left: calc(var(--shutter-size) / -2);
+        border-radius: 100%;
+        background-color: rgb(198, 205, 216);
+        padding: 12px;
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+
+      .play-button {
+        background-color: rgb(255, 255, 255);
+        border-radius: 100%;
+        width: 100%;
+        height: 100%;
+      }
+
+      .play-button.running {
+        background-color: rgb(255, 0,0);
+        border-radius: 10%;
+        width: 100%;
+        height: 100%;
+      }
+
+      .play-button:active {
+        background-color: rgb(220, 220, 220);
+        border-radius: 100%;
+        width: 100%;
+        height: 100%;
+      }
+
+      .play-button.running:active {
+        background-color: rgb(220, 220, 220);
+        border-radius: 10%;
+        width: 100%;
+        height: 100%;
+      }
+
       @keyframes dce-rotate{from{transform:rotate(0turn);}to{transform:rotate(1turn);}}
       @keyframes dce-scanlight{from{top:0;}to{top:97%;}}
       .scanner{width:100%;height:100%;min-width:100px;min-height:100px;background:#eee;position:absolute;left:0;top:0;}
@@ -59,13 +112,18 @@
       <select class="dce-sel-resolution"></select>
     </div>
     <button class="close-btn" onclick="stopScan();">Close</button>
+    <div class="footer">
+      <div class="play">
+        <div class="play-button" onclick="toggleProcessing();"></div>
+      </div>
+    </div>
   </div>
   <script type="text/javascript">
   let client;
   let reader;
   let camera;
   let interval;
-  let processing = false; 
+  let processing = false;
 
   initDBR();
 
@@ -87,13 +145,30 @@
   }
 
   async function startScan(){
+    const playButton = document.getElementsByClassName("play-button")[0];
+    playButton.classList.add("running");
     await camera.open(true);
     startProcessingLoop();
   }
 
   function stopScan(){
+    const playButton = document.getElementsByClassName("play-button")[0];
+    playButton.classList.remove("running");
     stopProcessingLoop();
     camera.close(true);
+  }
+
+  function toggleProcessing(){
+    const playButton = document.getElementsByClassName("play-button")[0];
+    if (interval) {
+      playButton.classList.remove("running")
+      console.log("stop");
+      stopProcessingLoop();
+    }else{
+      console.log("start");
+      playButton.classList.add("running");
+      startProcessingLoop();
+    }
   }
 
   function startProcessingLoop(){
@@ -104,6 +179,7 @@
   function stopProcessingLoop(){
     if (interval) {
       clearInterval(interval);
+      interval = undefined;
     }
     processing = false;
   }
@@ -127,7 +203,7 @@
         Toastify({
           text: "Barcode found: "+barcode,
           duration: 2000,
-          gravity: "bottom",
+          gravity: "top",
           position: "center"
         }).showToast();
         publish(barcode);

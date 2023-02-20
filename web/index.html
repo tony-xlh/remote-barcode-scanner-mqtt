@@ -222,8 +222,13 @@
 
   function connect(){
     const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8)
-
-    const host = 'ws://broker.emqx.io:8083/mqtt'
+    let host;
+    if (window.location.protocol === "https:") {
+      host = 'wss://broker.emqx.io:8083/mqtt'
+    }else{
+      host = 'ws://broker.emqx.io:8083/mqtt'
+    }
+    
 
     const options = {
       keepalive: 60,

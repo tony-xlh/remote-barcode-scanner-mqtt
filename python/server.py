@@ -3,6 +3,7 @@ import pyautogui
 import config
 import pyperclip
 import sys
+import time
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
@@ -18,6 +19,7 @@ def on_message(client, userdata, msg):
     for key in config.keys_to_prepend:
       pyautogui.press(key)
     pyperclip.copy(barcode)
+    time.sleep(0.5)
     if sys.platform == 'darwin':
       pyautogui.hotkey('command', 'v')
     else:

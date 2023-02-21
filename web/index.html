@@ -8,8 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.2/dist/dbr.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-camera-enhancer@3.2.0/dist/dce.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>-->
     <style>
       .app {
         position: fixed;
@@ -102,7 +102,7 @@
       </div>
       <div>
         <label>Continuous scan:</label>
-        <input type="checkbox" id="continuous" checked/>
+        <input type="checkbox" id="continuous"/>
       </div>
     </div>
     <button onclick="startScan();">Scan</button>
@@ -135,7 +135,7 @@
 
   async function initDBR() {
     updateStatus('Initializing...');
-    Dynamsoft.DBR.BarcodeReader.license = 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9';
+    Dynamsoft.DBR.BarcodeReader.license = 'DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==';
     reader = await Dynamsoft.DBR.BarcodeReader.createInstance();
     camera = await Dynamsoft.DCE.CameraEnhancer.createInstance();
     await camera.setUIElement(document.getElementsByClassName("scanner")[0]);
@@ -270,7 +270,6 @@
     client.on('connect', () => {
       console.log('Client connected:' + clientId)
       updateStatus('Connected');
-      publish("connected");
     })
   }
 

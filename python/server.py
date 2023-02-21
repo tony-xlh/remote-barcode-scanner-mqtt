@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 import pyautogui
+import config
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
@@ -7,8 +8,16 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
-    pyautogui.write(msg.payload.decode())
-    pyautogui.press('enter')
+    barcode = msg.payload.decode()
+    if config.text_to_prepend != "":
+      barcode = config.text_to_prepend + barcode
+    if config.text_to_append != "":
+      barcode = barcode + config.text_to_append
+    for key in config.keys_to_prepend:
+      pyautogui.press(key)
+    pyautogui.write(barcode)
+    for key in config.keys_to_append:
+      pyautogui.press(key)
 
 client = mqtt.Client()
 client.on_connect = on_connect

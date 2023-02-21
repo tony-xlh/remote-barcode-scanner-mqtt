@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import pyautogui
 import config
+import pyperclip
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
@@ -15,7 +16,9 @@ def on_message(client, userdata, msg):
       barcode = barcode + config.text_to_append
     for key in config.keys_to_prepend:
       pyautogui.press(key)
-    pyautogui.write(barcode)
+    print(barcode)
+    pyperclip.copy(barcode)
+    pyautogui.hotkey('ctrl', 'v')
     for key in config.keys_to_append:
       pyautogui.press(key)
 

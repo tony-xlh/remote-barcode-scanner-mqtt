@@ -5,7 +5,7 @@ Turn your phones into a remote barcode scanner that scans barcodes to desktop de
 Usage:
 
 1. Open the [Web App](https://tony-xlh.github.io/remote-barcode-scanner-mqtt/web/) with your phone.
-2. Start the server on your PC devices: `python python/server.py`
+2. Start the server on your PC devices: `python python/server.py`. Install dependencies first: `pip install python/requirements.txt`.
 3. Open the app you need to enter your data and then use your phone to scan barcodes. The barcode result will be passed to the app.
 
 It uses MQTT for communication and [Dynamsoft Barcode Reader](https://www.dynamsoft.com/barcode-reader/overview/) to scan barcodes.

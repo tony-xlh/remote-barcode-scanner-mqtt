@@ -10,12 +10,6 @@ Usage:
 
 It uses MQTT for communication and [Dynamsoft Barcode Reader](https://www.dynamsoft.com/barcode-reader/overview/) to scan barcodes.
 
-## Demo which scans to Excel
+## Demo video which scans to Excel
 
-On the phone:
-
-<https://user-images.githubusercontent.com/5462205/220256540-a2433986-a6ef-402b-a0c7-e367ebdf8369.mp4>
-
-On the PC:
-
-<https://user-images.githubusercontent.com/5462205/220256806-b926286d-d757-4497-b542-ff102773b1b2.mp4>
+<https://user-images.githubusercontent.com/5462205/220531632-00f16525-0145-4abe-b589-6ffb994aeca7.mp4>

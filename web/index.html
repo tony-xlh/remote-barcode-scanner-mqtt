@@ -201,6 +201,7 @@
       return;
     }
     let frame = camera.getFrame();
+    console.log(frame);
     if (frame) {
       processing = true; // set decoding to true so that the next frame will be skipped if the decoding has not completed.
       let results = await reader.decode(frame);

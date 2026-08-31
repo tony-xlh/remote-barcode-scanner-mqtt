@@ -6,8 +6,7 @@
     <link rel="stylesheet" type="text/css" href="toastify.min.css">
     <script src="toastify-js.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.2/dist/dbr.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-camera-enhancer@3.2.0/dist/dce.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.6.3000/dist/dbr.bundle.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>-->
     <style>
@@ -126,7 +125,7 @@
   </div>
   <script type="text/javascript">
   let client;
-  let reader;
+  let cvr;
   let camera;
   let interval;
   let processing = false;
@@ -135,22 +134,28 @@
 
   async function initDBR() {
     updateStatus('Initializing...');
-    Dynamsoft.DBR.BarcodeReader.license = 'DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==';
-    reader = await Dynamsoft.DBR.BarcodeReader.createInstance();
+    await Dynamsoft.License.LicenseManager.initLicense('DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==');
+    cvr = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+    // Only read barcodes inside the middle band of the view
+    let settings = await cvr.getSimplifiedSettings("ReadBarcodes_Default");
+    settings.roi = {
+      points: [
+        { x: 0, y: 35 },
+        { x: 100, y: 35 },
+        { x: 100, y: 65 },
+        { x: 0, y: 65 }
+      ]
+    };
+    settings.roiMeasuredInPercentage = true;
+    await cvr.updateSettings("ReadBarcodes_Default", settings);
     camera = await Dynamsoft.DCE.CameraEnhancer.createInstance();
     await camera.setUIElement(document.getElementsByClassName("scanner")[0]);
-    camera.setScanRegion({
-      regionLeft:0,
-      regionTop:35,
-      regionRight:100,
-      regionBottom:65,
-      regionMeasuredByPercentage: 1
-    });
-    updateStatus('Initializd');
+    updateStatus('Initialized');
     connect();
   }
 
   async function startScan(){
+    document.getElementsByClassName("scanner")[0].style.display = "block"; // v11 CameraEnhancer does not auto-show the UI element
     const playButton = document.getElementsByClassName("play-button")[0];
     playButton.classList.add("running");
     await camera.open(true);
@@ -162,6 +167,7 @@
     playButton.classList.remove("running");
     stopProcessingLoop();
     camera.close(true);
+    document.getElementsByClassName("scanner")[0].style.display = "none";
   }
 
   function toggleProcessing(){
@@ -191,7 +197,7 @@
   }
 
   async function captureAndDecode() {
-    if (!camera || !reader) {
+    if (!camera || !cvr) {
       return
     }
     if (camera.isOpen() === false) {
@@ -200,12 +206,13 @@
     if (processing == true) {
       return;
     }
-    let frame = camera.getFrame();
+    let frame = camera.fetchImage();
     if (frame) {
       processing = true; // set decoding to true so that the next frame will be skipped if the decoding has not completed.
-      let results = await reader.decode(frame);
-      if (results.length > 0) {
-        let barcode = results[0].barcodeText;
+      let results = await cvr.capture(frame, "ReadBarcodes_Default");
+      let barcodes = results.items.filter(item => item.type === Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE);
+      if (barcodes.length > 0) {
+        let barcode = barcodes[0].text;
         Toastify({
           text: "Barcode found: "+barcode,
           duration: 2000,
@@ -232,9 +239,9 @@
     const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8)
     let host;
     if (window.location.protocol === "https:") {
-      host = 'wss://mqtt.eclipseprojects.io:443/mqtt'
+      host = 'wss://broker.emqx.io:8084/mqtt'
     }else{
-      host = 'ws://mqtt.eclipseprojects.io:80/mqtt'
+      host = 'ws://broker.emqx.io:8083/mqtt'
     }
     
 

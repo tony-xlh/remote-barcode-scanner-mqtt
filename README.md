@@ -8,7 +8,7 @@ Usage:
 2. Start the server on your PC devices: `python python/server.py`. Install dependencies first: `pip install -r python/requirements.txt`.
 3. Open the app you need to enter your data and then use your phone to scan barcodes. The barcode result will be passed to the app.
 
-It uses MQTT for communication and [Dynamsoft Barcode Reader](https://www.dynamsoft.com/barcode-reader/overview/) to scan barcodes.
+It uses MQTT for communication and [Dynamsoft Barcode Reader Bundle for JavaScript](https://www.npmjs.com/package/dynamsoft-barcode-reader-bundle) (`dynamsoft-barcode-reader-bundle@11.6.3000`, loaded from the jsDelivr CDN) to scan barcodes. The web app decodes camera frames through `CaptureVisionRouter` with the `ReadBarcodes_Default` template restricted to a middle-band ROI, then publishes the decoded text to the `barcode` MQTT topic via `broker.emqx.io` (`ws://broker.emqx.io:8083/mqtt` or `wss://broker.emqx.io:8084/mqtt`; the Python receiver uses TCP port 1883). Edit `python/config.py` and the `connect()` host in `web/index.html` to point both at your own broker instead.
 
 ## Demo video which scans to Excel
 
